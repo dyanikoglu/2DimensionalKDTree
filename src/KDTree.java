@@ -507,9 +507,8 @@ public class KDTree {
                 }
 
                 transferNode.getData().depthDecrement(); // Decrease transferNode's depth by one
-                if(V.getParent().getParent() != null) { //Safe removal
+                if(!V.getParent().getParent().equals(guard)) { //Safe removal
                     transferNode.setParent(V.getParent().getParent()); // Set it's new parent
-
                     // Set our transferNode as new parent's left or right Child
                     if (V.getParent().getParent().getLeftChild().equals(V.getParent())) {
                         V.getParent().getParent().setLeftChild(transferNode);

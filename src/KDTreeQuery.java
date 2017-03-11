@@ -130,7 +130,7 @@ public class KDTreeQuery {
                         System.err.println("\nOne of given parameter for search directive is NaN");
                         return;
                     }
-                    System.out.println("\nDisplaying points in given range:");
+                    System.out.printf("\nDisplaying points in given range (%s<=x<=%s, %s<=y<=%s) :\n", llx, urx, lly, ury );
                     tree.printRange(new Point2D.Double(llx, lly), new Point2D.Double(urx, ury));
                     break;
                 }
