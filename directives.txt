@@ -1,0 +1,12 @@
+findMinX
+findMinY
+findMaxX
+findMaxY
+display-tree
+display-points
+range 0 0 10 10
+insert 0 0.5
+display-tree
+remove 6 4
+display-tree
+quit
