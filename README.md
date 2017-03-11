@@ -1,37 +1,44 @@
-## Welcome to GitHub Pages
+# 2-Dimensional K-D Tree 
 
-You can use the [editor on GitHub](https://github.com/dyanikoglu/2-Dimensional-KDTree/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+##How to compile and run the program:
 ```
+javac KDQuery.java
+java KDQuery points.txt directives.txt
+```
+##Input Files:
+###Points Input File
+Example file, first column is x coordinate and second column is y coordinate:
+```
+1 0
+2 3
+4 5
+6 7
+```
+###Directives Input File
+Example file, first column is directive, other columns are parameters of directive.
+```
+findMaxY
+display-tree
+display-points
+range 0 0 10 10
+insert 0 0.5
+quit
+```
+####Directives
+#####insert x y | Insert point (x,y) into the tree
+#####remove x y | Remove point (x,y) from the tree
+#####search x y | Search for point (x,y) in the tree
+#####findMinX | Print the point with the smallest x coordinate
+#####findMinY | Print the point with the smallest y coordinate
+#####findMaxX | Print the point with the largest x coordinate
+#####findMaxY | Print the point with the largest y coordinate
+#####display-tree | Display the tree
+#####display-points | Print a list of points from left to right
+#####range llx lly urx ury | Print the list of points within the rectangle specified by lowerleft corner (llx, lly) and upperright corner (urx, ury)
+#####quit | End program
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+##Known Bugs and Limitations:
+List any known bugs, deﬁciencies, or limitations with respect to the project speciﬁcations. File directory: If you have multiple source or data ﬁles, please explain the purpose of each.
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/dyanikoglu/2-Dimensional-KDTree/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+##Source Files: 
+All the source ﬁles.
