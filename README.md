@@ -49,6 +49,9 @@ Print the list of points within the rectangle specified by lowerleft corner (llx
 End program
 ##Known Bugs and Limitations:
 - Point values can't be bigger than Double.MAX_VALUE or smaller than -Double.MAX_VALUE
+- General Position rules(no same x or y coords between 2 different points) apply.
+- As far as I tested, Insert & Remove methods must work correctly in any case. Whole tree can be removed or a brand new tree can be created from scratch with these methods.
+- For range directive, given range can't be a line or a point.
 
 ##Source Files: 
 - KDNode.java
