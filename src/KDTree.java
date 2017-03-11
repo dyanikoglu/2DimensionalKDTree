@@ -69,26 +69,50 @@ public class KDTree {
         }
     }
 
-    private static KDNode build(List<Point2D> P, int depth) {
+    /**
+     * Iterates filter array, returns objects found in target array, in order.
+     * @param target Target array for select process
+     * @param filter The array going to be filtered by target values
+     * @return Filtered array
+     */
+    private static List<Point2D> select(List<Point2D> target, List<Point2D> filter) {
+        List<Point2D> toReturn = new ArrayList<Point2D>();
+        for(Point2D elem: filter) {
+            if(target.contains(elem)) {
+                toReturn.add(elem);
+            }
+        }
+        return toReturn;
+    }
+
+    /**
+     * Creates a kd-tree with given points. Does not applies a sorting algorithm in each step, just selects required elements from sub arrays.
+     * So, expected running time will be O(nlogn)
+     * @param Px Current X-Ordered point list
+     * @param Py Current Y-Ordered point list
+     * @param depth Current Depth
+     * @return Root of tree
+     */
+    private static KDNode build(List<Point2D> Px, List<Point2D> Py, int depth) {
         int median;
         Point2D intersectingPoint;
         KDNode vLeft, vRight;
         NodeData.Direction currentDir;
-        if (P.size() == 1) {
-            return createNode(null, null, new NodeData(NodeData.Direction.Point, P.get(0), depth));
+        if (Px.size() == 1) {
+            return createNode(null, null, new NodeData(NodeData.Direction.Point, Px.get(0), depth));
         } else if (depth % 2 == 0) {
-            P.sort(Comparator.comparingDouble(Point2D::getX));
             currentDir = NodeData.Direction.Vertical;
-            median = (P.size() - 1) / 2;
-            intersectingPoint = P.get(median);
+            median = (Px.size() - 1) / 2;
+            intersectingPoint = Px.get(median);
+            vLeft = build(Px.subList(0, median + 1), select(Px.subList(0, median + 1), Py), depth + 1);
+            vRight = build(Px.subList(median + 1, Px.size()), select(Px.subList(median + 1, Px.size()), Py), depth + 1);
         } else {
-            P.sort(Comparator.comparingDouble(Point2D::getY));
             currentDir = NodeData.Direction.Horizontal;
-            median = (P.size() - 1) / 2;
-            intersectingPoint = P.get(median);
+            median = (Py.size() - 1) / 2;
+            intersectingPoint = Py.get(median);
+            vLeft = build(select(Py.subList(0, median + 1), Px), Py.subList(0, median + 1), depth + 1);
+            vRight = build(select(Py.subList(median + 1, Py.size()), Px), Py.subList(median + 1, Py.size()), depth + 1);
         }
-        vLeft = build(P.subList(0, median + 1), depth + 1);
-        vRight = build(P.subList(median + 1, P.size()), depth + 1);
         return createNode(vLeft, vRight, new NodeData(currentDir, intersectingPoint, depth));
     }
 
@@ -115,10 +139,15 @@ public class KDTree {
      */
     public static KDTree buildKDTree(ArrayList<Point2D> P) {
         KDTree tree = new KDTree();
-        if(P.size() == 0) {
+        if(P.size() == 0) { // Return empty tree
             return tree;
         }
-        tree.setRoot(build(P, 0));
+        ///// Preprocessing
+        List<Point2D> P2 = new ArrayList<>();
+        P2.addAll(P);
+        P.sort(Comparator.comparingDouble(Point2D::getX));
+        P2.sort(Comparator.comparingDouble(Point2D::getY));
+        tree.setRoot(build(P, P2, 0));
         tree.calculateRegions();
         return tree;
     }
