@@ -172,7 +172,8 @@ public class KDTreeQuery {
         ArrayList<Point2D> allPoints = new ArrayList<>();
 
         for (String line : pointsList) {
-            String[] points = line.split(" ");
+            line = line.replaceAll("[ ]", "\t");
+            String[] points = line.split("\t");
             try {
                 allPoints.add(new Point2D.Double(Double.parseDouble(points[0]), Double.parseDouble(points[1])));
             } catch(NumberFormatException e){

@@ -11,6 +11,7 @@ import java.util.List;
 
 public class KDTree {
     private KDNode root;
+    private KDNode guard; // A guard node for safe calculation of root's region
 
     /**
      * Returns minimum valued point in dimension d
@@ -114,6 +115,9 @@ public class KDTree {
      */
     public static KDTree buildKDTree(ArrayList<Point2D> P) {
         KDTree tree = new KDTree();
+        if(P.size() == 0) {
+            return tree;
+        }
         tree.setRoot(build(P, 0));
         tree.calculateRegions();
         return tree;
@@ -124,6 +128,9 @@ public class KDTree {
      */
     public KDTree() {
         this.root = null;
+        this.guard = createNode(root,root, new NodeData(NodeData.Direction.Point, new Point2D.Double(0,0), -1));
+        guard.getData().setLeftRegion(new RectangularHalfPlane());
+        guard.getData().setRightRegion(new RectangularHalfPlane());
     }
 
     /**
@@ -131,6 +138,8 @@ public class KDTree {
      * @param nd New root node
      */
     public void setRoot(KDNode nd) {
+        guard.setLeftChild(nd);
+        guard.setRightChild(nd);
         root = nd;
     }
 
@@ -152,6 +161,10 @@ public class KDTree {
      * Prints tree layout to console.
      */
     public void displayTree() {
+        if(root == null) {
+            System.out.println("Tree is empty!");
+            return;
+        }
         preOrderPrint(root);
     }
 
@@ -168,7 +181,7 @@ public class KDTree {
         }
         if (dpth % 2 == d) {
             if (nd.getLeftChild() == null) {
-                return innerFindMin(nd.getLeftChild(), d, dpth + 1);
+                return nd.getData().getPoint();
             }
             return innerFindMin(nd.getLeftChild(), d, dpth + 1);
         } else {
@@ -198,7 +211,7 @@ public class KDTree {
         }
         if (dpth % 2 == d) {
             if (nd.getRightChild() == null) {
-                return innerFindMax(nd.getRightChild(), d, dpth + 1);
+                return nd.getData().getPoint();
             }
             return innerFindMax(nd.getRightChild(), d, dpth + 1);
         } else {
@@ -281,6 +294,10 @@ public class KDTree {
      * Prints all point nodes in the tree to console.
      */
     public void displayPoints() {
+        if(root==null) {
+            System.out.println("There are no points in tree!");
+            return;
+        }
         this.depthFirstPrint(root);
         System.out.println();
     }
@@ -354,6 +371,10 @@ public class KDTree {
      * @param urc Upper Right Corner Point
      */
     public void printRange(Point2D llc, Point2D urc) {
+        if(llc.getX() == urc.getX() || llc.getY() == urc.getY()) {
+            System.out.println("Range can't be a line or a point!");
+            return;
+        }
         RectangularHalfPlane range = new RectangularHalfPlane(llc.getX(), llc.getY(), urc.getX(), urc.getY());
         SearchKDTree(root, range);
         System.out.println();
@@ -372,8 +393,13 @@ public class KDTree {
             int d = currDepth % 2;
             NodeData.Direction currentDir = d == 0 ? NodeData.Direction.Vertical : NodeData.Direction.Horizontal;
             V.getData().setDirection(currentDir);
+            boolean isVLeftChild;
 
-            boolean isVLeftChild = V.getParent().getLeftChild().equals(V);
+            if(V.equals(root)) {
+                isVLeftChild = true;
+            } else {
+                isVLeftChild = V.getParent().getLeftChild().equals(V);
+            }
 
             if (currentDir == NodeData.Direction.Vertical) { // Line is vertical, compare with X coords
                 if (P.getX() <= backup.getX()) { // Line will be created from new point
@@ -421,7 +447,12 @@ public class KDTree {
      * @param point Point to be inserted
      */
     public void insert(Point2D point) {
-        innerInsert(root, point);
+        if(root == null) {
+            setRoot(createNode(null, null, new NodeData(NodeData.Direction.Point, point, 0)));
+            root.setParent(guard);
+        } else {
+            innerInsert(root, point);
+        }
         System.out.printf("\nInserted (%s, %s)\n", point.getX(), point.getY());
     }
 
@@ -439,6 +470,11 @@ public class KDTree {
                 // Found point is not same with the one going to be removed
                 return false;
             } else { // Searching point is found
+                if(V.equals(root)) { // Removal of last point in tree
+                    setRoot(null);
+                    return true;
+                }
+
                 boolean isVLeftChild = V.getParent().getLeftChild().equals(V);
                 KDNode transferNode;
 
@@ -449,6 +485,11 @@ public class KDTree {
                         transferNode.getData().setDirection(V.getParent().getData().getDirection());
                         transferNode.getLeftChild().getData().depthDecrement(); // Decrease child's depths by one
                         transferNode.getRightChild().getData().depthDecrement();
+                    } else {  // Sibling is a point
+                        if(V.getParent().equals(root)) { // Just 1 point will left after removal, set sibling as root
+                            setRoot(V.getParent().getRightChild());
+                            return true;
+                        }
                     }
                 } else { // is Right Child
                     transferNode = V.getParent().getLeftChild(); // Node to be transferred one step up
@@ -457,17 +498,27 @@ public class KDTree {
                         transferNode.getData().setDirection(V.getParent().getData().getDirection());
                         transferNode.getLeftChild().getData().depthDecrement(); // Decrease child's depths by one
                         transferNode.getRightChild().getData().depthDecrement();
+                    } else { // Sibling is a point
+                        if(V.getParent().equals(root)) { // Just 1 point will left after removal, set sibling as root
+                            setRoot(V.getParent().getLeftChild());
+                            return true;
+                        }
                     }
                 }
 
                 transferNode.getData().depthDecrement(); // Decrease transferNode's depth by one
-                transferNode.setParent(V.getParent().getParent()); // Set it's new parent
+                if(V.getParent().getParent() != null) { //Safe removal
+                    transferNode.setParent(V.getParent().getParent()); // Set it's new parent
 
-                // Set our transferNode as new parent's left or right Child
-                if (V.getParent().getParent().getLeftChild().equals(V.getParent())) {
-                    V.getParent().getParent().setLeftChild(transferNode);
-                } else {
-                    V.getParent().getParent().setRightChild(transferNode);
+                    // Set our transferNode as new parent's left or right Child
+                    if (V.getParent().getParent().getLeftChild().equals(V.getParent())) {
+                        V.getParent().getParent().setLeftChild(transferNode);
+                    } else {
+                        V.getParent().getParent().setRightChild(transferNode);
+                    }
+                } else { // Not a safe removal, reached to root of tree. Set transferNode as new root
+                    transferNode.setParent(guard);
+                    setRoot(transferNode);
                 }
 
                 // Set new regions of transferNode ( If node is converted into a line from point )

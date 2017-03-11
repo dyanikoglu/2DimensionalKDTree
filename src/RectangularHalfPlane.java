@@ -110,6 +110,6 @@ public class RectangularHalfPlane {
      * @return True if half planes intersect, false otherwise
      */
     public boolean intersects(RectangularHalfPlane hp) {
-        return (hp.maxX >= this.maxX || hp.minX <= this.minX || hp.maxY >= this.maxY || hp.minY <= this.minY);
+        return !(hp.maxX < this.minX || hp.minX > this.maxX || hp.maxY < this.minY || hp.minY > this.maxY);
     }
 }

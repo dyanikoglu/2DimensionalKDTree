@@ -58,10 +58,12 @@ public class KDNode {
     }
 
     public void setLeftChild(KDNode nd) {
+        nd.setParent(this);
         leftChild = nd;
     }
 
     public void setRightChild(KDNode nd) {
+        nd.setParent(this);
         rightChild = nd;
     }
 }
