@@ -1,11 +1,10 @@
-# 2-Dimensional K-D Tree 
-
-##How to compile and run the program:
+# 2 Dimensional kd-tree 
+##How to compile and run the program
 ```
 javac KDQuery.java
 java KDQuery points.txt directives.txt
 ```
-##Input Files:
+##Input Files
 ###Points Input File
 Example file, first column is x coordinate and second column is y coordinate:
 ```
@@ -15,7 +14,7 @@ Example file, first column is x coordinate and second column is y coordinate:
 6 7
 ```
 ###Directives Input File
-Example file, first column is directive, other columns are parameters of directive.
+Example file, first column is directive, other columns are parameters of directive:
 ```
 findMaxY
 display-tree
@@ -47,13 +46,13 @@ Print a list of points from left to right
 Print the list of points within the rectangle specified by lowerleft corner (llx, lly) and upperright corner (urx, ury)
 #####quit
 End program
-##Known Bugs and Limitations:
+##Known Bugs and Limitations
 - Point values can't be bigger than Double.MAX_VALUE or smaller than -Double.MAX_VALUE
 - General Position rules(no same x or y coords between 2 different points) apply.
 - As far as I tested, Insert & Remove methods must work correctly in any case. Whole tree can be removed or a brand new tree can be created from scratch with these methods.
 - For range directive, given range can't be a line or a point.
 
-##Source Files: 
+##Source Files
 - KDNode.java
 - KDTree.java
 - KDTreeQuery.java
