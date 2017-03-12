@@ -146,43 +146,14 @@ public class KDTreeQuery {
     }
 
     public static void main(String[] args) {
-        String pointsFileName = args[0];
         String directiveFileName = args[1];
-        List<String> pointsList = new ArrayList<>();
         List<String> directivesList = new ArrayList<>();
-
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(pointsFileName))) {
-
-            //br returns as stream and convert it into a List
-            pointsList = br.lines().collect(Collectors.toList());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         try (BufferedReader br = Files.newBufferedReader(Paths.get(directiveFileName))) {
-
-            //br returns as stream and convert it into a List
             directivesList = br.lines().collect(Collectors.toList());
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        ArrayList<Point2D> allPoints = new ArrayList<>();
-
-        for (String line : pointsList) {
-            line = line.replaceAll("[ ]", "\t");
-            String[] points = line.split("\t");
-            try {
-                allPoints.add(new Point2D.Double(Double.parseDouble(points[0]), Double.parseDouble(points[1])));
-            } catch(NumberFormatException e){
-                System.err.println("\nInvalid file content for points");
-            }
-        }
-
-        tree = KDTree.buildKDTree(allPoints);
-
+        tree = KDTree.buildKDTree(args[0]);
         for (String line : directivesList) {
             line = line.replaceAll("[ ]", "\t"); // In case of usage of tab instead of space
             String[] directive = line.split("\t");

@@ -1,6 +1,11 @@
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A K-Dimensional Tree Implementation with specific functionalities like insert node, remove node, search range etc.
@@ -76,7 +81,7 @@ public class KDTree {
      * @return Filtered array
      */
     private static List<Point2D> select(List<Point2D> target, List<Point2D> filter) {
-        List<Point2D> toReturn = new ArrayList<Point2D>();
+        List<Point2D> toReturn = new ArrayList<>();
         for(Point2D elem: filter) {
             if(target.contains(elem)) {
                 toReturn.add(elem);
@@ -134,20 +139,40 @@ public class KDTree {
 
     /**
      * Creates a K-Dimensional tree from parameter point list. Calculates regions after building.
-     * @param P List of points
-     * @return A K-Dimensional Tree from list of points
+     * @param fileName The point list's file name
+     * @return  A K-Dimensional Tree from list of points
      */
-    public static KDTree buildKDTree(ArrayList<Point2D> P) {
+    public static KDTree buildKDTree(String fileName) {
+        List<String> pointsList = new ArrayList<>();
+        ArrayList<Point2D> allPoints = new ArrayList<>();
+
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(fileName))) {
+            pointsList = br.lines().collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String line : pointsList) {
+            line = line.replaceAll("[ ]", "\t");
+            String[] points = line.split("\t");
+            try {
+                allPoints.add(new Point2D.Double(Double.parseDouble(points[0]), Double.parseDouble(points[1])));
+            } catch(NumberFormatException e){
+                System.err.println("\nInvalid file content for points");
+            }
+        }
+
         KDTree tree = new KDTree();
-        if(P.size() == 0) { // Return empty tree
+        if(allPoints.size() == 0) { // Return empty tree
             return tree;
         }
+
         ///// Preprocessing
-        List<Point2D> P2 = new ArrayList<>();
-        P2.addAll(P);
-        P.sort(Comparator.comparingDouble(Point2D::getX));
-        P2.sort(Comparator.comparingDouble(Point2D::getY));
-        tree.setRoot(build(P, P2, 0));
+        List<Point2D> allPoints2 = new ArrayList<>();
+        allPoints2.addAll(allPoints);
+        allPoints.sort(Comparator.comparingDouble(Point2D::getX));
+        allPoints2.sort(Comparator.comparingDouble(Point2D::getY));
+        tree.setRoot(build(allPoints, allPoints2, 0));
         tree.calculateRegions();
         return tree;
     }
@@ -157,7 +182,7 @@ public class KDTree {
      */
     public KDTree() {
         this.root = null;
-        this.guard = createNode(root,root, new NodeData(NodeData.Direction.Point, new Point2D.Double(0,0), -1));
+        this.guard = createNode(null,null, new NodeData(NodeData.Direction.Point, new Point2D.Double(0,0), -1));
         guard.getData().setLeftRegion(new RectangularHalfPlane());
         guard.getData().setRightRegion(new RectangularHalfPlane());
     }
