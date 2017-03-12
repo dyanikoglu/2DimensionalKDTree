@@ -1,12 +1,29 @@
-findMinX
-findMinY
-findMaxX
-findMaxY
 display-tree
-display-points
-range 0 0 10 10
-insert 0 0.5
-display-tree
+range 2 0 12 10
+remove 11 1
+range 2 0 12 10
+insert 5 5
+range 2 0 12 10
 remove 6 4
+remove 7 7
+range 2 0 12 10
+remove 5 5
+range 2 0 12 10
 display-tree
-quit
+remove 9 15
+display-tree
+remove 8 -1
+display-tree
+remove 0 0
+display-tree
+insert 1 1
+insert 3 3
+insert 6 8
+display-tree
+remove -5 2
+display-tree
+range 0 0 6 8
+findminx
+findminy
+findmaxx
+findmaxy
